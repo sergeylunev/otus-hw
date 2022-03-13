@@ -12,7 +12,7 @@ var ErrInvalidString = errors.New("invalid string")
 func Unpack(input string) (string, error) {
 	var result strings.Builder
 
-	var previous rune = 0
+	var previous rune
 
 	for i, r := range input {
 		if i == 0 && unicode.IsDigit(r) {
