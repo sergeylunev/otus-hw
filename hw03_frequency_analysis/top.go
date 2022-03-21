@@ -18,7 +18,7 @@ func Top10(input string) []string {
 
 	wordsCountMap := make(map[string]int)
 	for _, word := range words {
-		wordsCountMap[word] = wordsCountMap[word] + 1
+		wordsCountMap[word]++
 	}
 
 	wordsResultCountSlice := make([]WordCount, 0, len(wordsCountMap))
@@ -41,7 +41,7 @@ func Top10(input string) []string {
 		length = 10
 	}
 
-	result := make([]string, length, length)
+	result := make([]string, length)
 	for i, word := range wordsResultCountSlice[:length] {
 		result[i] = word.Word
 	}
