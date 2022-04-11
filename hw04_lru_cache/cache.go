@@ -54,7 +54,12 @@ func (lc *lruCache) Get(key Key) (interface{}, bool) {
 	}
 }
 
-func (lc *lruCache) Clear() {}
+func (lc *lruCache) Clear() {
+	for k, v := range lc.items {
+		lc.queue.Remove(v)
+		delete(lc.items, k)
+	}
+}
 
 type cacheItem struct {
 	key   Key
