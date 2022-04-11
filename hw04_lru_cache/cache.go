@@ -16,6 +16,46 @@ type lruCache struct {
 	items    map[Key]*ListItem
 }
 
+func (lc *lruCache) Set(key Key, value interface{}) bool {
+	if v, ok := lc.items[key]; ok {
+		v.Value = cacheItem{
+			key:   key,
+			value: value,
+		}
+		return true
+	} else {
+		if len(lc.items) == lc.capacity {
+			back := lc.queue.Back()
+			backKey := back.Value.(cacheItem).key
+			delete(lc.items, backKey)
+			lc.queue.Remove(back)
+		}
+
+		ci := cacheItem{
+			key:   key,
+			value: value,
+		}
+		lc.queue.PushFront(ci)
+		li := lc.queue.Front()
+		lc.items[key] = li
+
+		return false
+	}
+}
+
+func (lc *lruCache) Get(key Key) (interface{}, bool) {
+	if v, ok := lc.items[key]; !ok {
+		return nil, false
+	} else {
+		val := v.Value.(cacheItem)
+		lc.queue.MoveToFront(v)
+
+		return val.value, ok
+	}
+}
+
+func (lc *lruCache) Clear() {}
+
 type cacheItem struct {
 	key   Key
 	value interface{}

@@ -20,6 +20,83 @@ func TestCache(t *testing.T) {
 		require.False(t, ok)
 	})
 
+	t.Run("add item get item", func(t *testing.T) {
+		c := NewCache(2)
+
+		c.Set("a", 100)
+		v, ok := c.Get("a")
+
+		require.True(t, ok)
+		require.Equal(t, 100, v)
+	})
+
+	t.Run("add item change item get item", func(t *testing.T) {
+		c := NewCache(2)
+
+		ok := c.Set("a", 100)
+		require.False(t, ok)
+
+		v, ok := c.Get("a")
+		require.True(t, ok)
+		require.Equal(t, 100, v)
+
+		ok = c.Set("a", 200)
+		require.True(t, ok)
+
+		v, ok = c.Get("a")
+		require.True(t, ok)
+		require.Equal(t, 200, v)
+	})
+
+	t.Run("Remove last item from cache after add new item", func(t *testing.T) {
+		c := NewCache(2)
+
+		c.Set("a", 100)
+		c.Set("b", 200)
+
+		v, ok := c.Get("a")
+		require.True(t, ok)
+		require.Equal(t, 100, v)
+
+		v, ok = c.Get("b")
+		require.True(t, ok)
+		require.Equal(t, 200, v)
+
+		ok = c.Set("c", 300)
+		require.False(t, ok)
+
+		v, ok = c.Get("a")
+		require.Nil(t, v)
+		require.False(t, ok)
+
+		v, ok = c.Get("c")
+		require.Equal(t, 300, v)
+		require.True(t, ok)
+	})
+
+	t.Run("Add add get add item. Remove second item", func(t *testing.T) {
+		c := NewCache(2)
+
+		c.Set("a", 100)
+		c.Set("b", 200)
+		c.Get("a")
+
+		ok := c.Set("c", 300)
+		require.False(t, ok)
+
+		v, ok := c.Get("a")
+		require.True(t, ok)
+		require.Equal(t, 100, v)
+
+		v, ok = c.Get("b")
+		require.Nil(t, v)
+		require.False(t, ok)
+
+		v, ok = c.Get("c")
+		require.Equal(t, 300, v)
+		require.True(t, ok)
+	})
+
 	t.Run("simple", func(t *testing.T) {
 		c := NewCache(5)
 

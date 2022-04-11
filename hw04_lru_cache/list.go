@@ -88,10 +88,12 @@ func (l *list) Remove(i *ListItem) {
 
 	if i.Prev != nil {
 		i.Prev.Next = i.Next
+		l.last = i.Prev
 	}
 
 	if i.Next != nil {
 		i.Next.Prev = i.Prev
+		l.first = i.Next
 	}
 
 	l.length--
