@@ -15,6 +15,94 @@ func TestList(t *testing.T) {
 		require.Nil(t, l.Back())
 	})
 
+	t.Run("add to the front 1 item", func(t *testing.T) {
+		l := NewList()
+		l.PushFront(100)
+
+		require.Equal(t, 1, l.Len())
+		require.Equal(t, 100, l.Front().Value)
+		require.Equal(t, 100, l.Back().Value)
+	})
+
+	t.Run("add to the front 3 item", func(t *testing.T) {
+		l := NewList()
+		l.PushFront(100)
+		l.PushFront(200)
+		l.PushFront(300)
+
+		require.Equal(t, 3, l.Len())
+		require.Equal(t, 300, l.Front().Value)
+		require.Equal(t, 100, l.Back().Value)
+	})
+
+	t.Run("add to the back 1 item", func(t *testing.T) {
+		l := NewList()
+		l.PushBack(101)
+
+		require.Equal(t, 1, l.Len())
+		require.Equal(t, 101, l.Front().Value)
+		require.Equal(t, 101, l.Back().Value)
+	})
+
+	t.Run("add to the back 3 item", func(t *testing.T) {
+		l := NewList()
+		l.PushBack(101)
+		l.PushBack(202)
+		l.PushBack(303)
+
+		require.Equal(t, 3, l.Len())
+		require.Equal(t, 101, l.Front().Value)
+		require.Equal(t, 303, l.Back().Value)
+	})
+
+	t.Run("Remove middle of three items", func(t *testing.T) {
+		l := NewList()
+		l.PushFront(101)
+		l.PushBack(202)
+		l.PushBack(303)
+
+		v := l.Front().Next
+		l.Remove(v)
+		require.Equal(t, 2, l.Len())
+		require.Equal(t, 101, l.Front().Value)
+		require.Equal(t, 303, l.Back().Value)
+	})
+
+	t.Run("Remove last item from list", func(t *testing.T) {
+		l := NewList()
+		l.PushBack(100)
+
+		v := l.Front()
+		l.Remove(v)
+
+		require.Equal(t, 0, l.Len())
+		require.Nil(t, l.Front())
+		require.Nil(t, l.Back())
+	})
+
+	t.Run("Move middle item to the front", func(t *testing.T) {
+		l := NewList()
+		l.PushFront(101)
+		l.PushBack(202)
+		l.PushBack(303)
+
+		v := l.Front().Next
+		l.MoveToFront(v)
+		require.Equal(t, 3, l.Len())
+		require.Equal(t, 202, l.Front().Value)
+	})
+
+	t.Run("Move middle item to the front", func(t *testing.T) {
+		l := NewList()
+		l.PushFront(101)
+		l.PushBack(202)
+		l.PushBack(303)
+
+		l.MoveToFront(l.Front())
+		require.Equal(t, 3, l.Len())
+		require.Equal(t, 101, l.Front().Value)
+	})
+
 	t.Run("complex", func(t *testing.T) {
 		l := NewList()
 
