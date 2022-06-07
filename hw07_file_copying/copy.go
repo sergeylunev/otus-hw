@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/cheggaaa/pb/v3"
+	pb "github.com/cheggaaa/pb/v3"
 )
 
 var (
@@ -54,6 +54,7 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	}
 
 	progress := pb.Full.Start64(limit)
+
 	defer progress.Finish()
 
 	progressReader := progress.NewProxyReader(fromFile)
