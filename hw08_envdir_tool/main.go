@@ -17,5 +17,6 @@ func main() {
 		fmt.Print(err)
 	}
 
-	RunCmd(cmd, env)
+	exitCode := RunCmd(cmd, env)
+	os.Exit(exitCode)
 }

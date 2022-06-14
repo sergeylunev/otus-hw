@@ -2,8 +2,8 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"os"
+	"path"
 	"strings"
 )
 
@@ -45,7 +45,7 @@ func ReadDir(dir string) (Environment, error) {
 			}
 			continue
 		}
-		bytes, err := os.ReadFile(dir + "/" + f.Name())
+		bytes, err := os.ReadFile(path.Join(dir + "/" + f.Name()))
 
 		if err != nil {
 			return nil, err
@@ -59,8 +59,6 @@ func ReadDir(dir string) (Environment, error) {
 			Value:      result,
 			NeedRemove: false,
 		}
-
-		fmt.Println(result)
 	}
 
 	if err != nil {
@@ -71,7 +69,7 @@ func ReadDir(dir string) (Environment, error) {
 }
 
 func readEnvFromFile(b []byte) (string, error) {
-	result := make([]byte, 0)
+	result := make([]byte, 0, len(b))
 	for _, ch := range b {
 		if ch == 10 {
 			break
