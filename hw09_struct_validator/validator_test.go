@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 type UserRole string
@@ -42,10 +44,54 @@ func TestValidate(t *testing.T) {
 		expectedErr error
 	}{
 		{
-			// Place your code here.
+			App{
+				Version: "333",
+			},
+			ValidationErrors{
+				ValidationError{Err: ErrValidationLength, Field: "Version"},
+			},
 		},
-		// ...
-		// Place your code here.
+		{
+			App{
+				Version: "12345",
+			},
+			nil,
+		},
+		{
+			User{
+				ID:     "100500",
+				Name:   "Testov",
+				Age:    62,
+				Email:  "totaly.wrong",
+				Role:   "admin",
+				Phones: []string{"12345678910"},
+				meta:   nil,
+			},
+			ValidationErrors{
+				ValidationError{Err: ErrValidationLength, Field: "ID"},
+				ValidationError{Err: ErrValidationMaximum, Field: "Age"},
+				ValidationError{Err: ErrValidationRegexp, Field: "Email"},
+			},
+		},
+		{
+			Token{
+				Header:    nil,
+				Payload:   nil,
+				Signature: nil,
+			},
+			nil,
+		},
+		{
+			Response{
+				Code: 410,
+			},
+			ValidationErrors{
+				ValidationError{
+					Err:   ErrValidationContains,
+					Field: "Code",
+				},
+			},
+		},
 	}
 
 	for i, tt := range tests {
@@ -53,8 +99,17 @@ func TestValidate(t *testing.T) {
 			tt := tt
 			t.Parallel()
 
-			// Place your code here.
-			_ = tt
+			err := Validate(tt.in)
+
+			expectedErr, _ := tt.expectedErr.(ValidationErrors)
+			actualErr, _ := err.(ValidationErrors)
+
+			require.Len(t, actualErr, len(expectedErr))
+
+			for i, _ := range expectedErr {
+				require.Equal(t, expectedErr[i].Field, actualErr[i].Field)
+				require.Equal(t, expectedErr[i].Err, actualErr[i].Err)
+			}
 		})
 	}
 }
