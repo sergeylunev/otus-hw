@@ -3,21 +3,24 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/app"
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/logger"
-	internalhttp "github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/server/http"
-	memorystorage "github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/storage/memory"
+	"github.com/sergeylunev/otus-hw/hw12_13_14_15_calendar/internal/app"
+	"github.com/sergeylunev/otus-hw/hw12_13_14_15_calendar/internal/logger"
+	internalhttp "github.com/sergeylunev/otus-hw/hw12_13_14_15_calendar/internal/server/http"
+	"github.com/sergeylunev/otus-hw/hw12_13_14_15_calendar/internal/storage"
+	memorystorage "github.com/sergeylunev/otus-hw/hw12_13_14_15_calendar/internal/storage/memory"
+	sqlstorage "github.com/sergeylunev/otus-hw/hw12_13_14_15_calendar/internal/storage/sql"
 )
 
 var configFile string
 
 func init() {
-	flag.StringVar(&configFile, "config", "/etc/calendar/config.toml", "Path to configuration file")
+	flag.StringVar(&configFile, "config", "/home/sergey/Projects/otus-hw/hw12_13_14_15_calendar/configs/config.toml", "Path to configuration file")
 }
 
 func main() {
@@ -28,13 +31,31 @@ func main() {
 		return
 	}
 
-	config := NewConfig()
-	logg := logger.New(config.Logger.Level)
+	config := NewConfig(configFile)
 
-	storage := memorystorage.New()
+	logg, err := logger.New(config.Logger.Type, config.Logger.Directory, config.Logger.Level)
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	var storage storage.Storage
+	storageType := config.Storage.Type
+	if storageType == "MEMO" {
+		storage = memorystorage.New()
+	} else if storageType == "DB" {
+		storage, err = sqlstorage.New(config.Storage.GetDbConnectionString())
+		if err != nil {
+			os.Exit(1)
+		}
+	} else {
+		os.Exit(1)
+	}
+
 	calendar := app.New(logg, storage)
 
-	server := internalhttp.NewServer(logg, calendar)
+	server := internalhttp.NewServer(logg, calendar, config.Server.Host, config.Server.Port)
 
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)

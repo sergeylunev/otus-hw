@@ -1,20 +1,64 @@
 package logger
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"time"
 
-type Logger struct { // TODO
+	ltime "github.com/sergeylunev/otus-hw/hw12_13_14_15_calendar/internal/time"
+)
+
+type Logger struct {
+	Type      string
+	Directory string
+	Level     string
+	file      *os.File
 }
 
-func New(level string) *Logger {
-	return &Logger{}
+func New(t string, directory string, level string) (*Logger, error) {
+	if _, err := os.Stat(directory); os.IsNotExist(err) {
+		err := os.Mkdir(directory, 0777)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if t == "FILE" {
+		f, err := os.OpenFile(filepath.Join(directory, "log.log"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		return &Logger{
+			Type:      t,
+			Directory: directory,
+			Level:     level,
+			file:      f,
+		}, nil
+	}
+
+	return &Logger{
+		Type:      t,
+		Directory: directory,
+		Level:     level,
+	}, nil
 }
 
 func (l Logger) Info(msg string) {
-	fmt.Println(msg)
+	l.write(fmt.Sprintf("[%s][%s] %s\n", "INFO", time.Now().Format(ltime.DateTimeFormat), msg))
 }
 
 func (l Logger) Error(msg string) {
-	// TODO
+	l.write(fmt.Sprintf("[%s][%s] %s\n", "ERROR", time.Now().Format(ltime.DateTimeFormat), msg))
 }
 
-// TODO
+func (l Logger) write(msg string) {
+	if l.Type == "FILE" {
+		l.file.WriteString(msg)
+	} else {
+		fmt.Println(msg)
+	}
+}
