@@ -19,3 +19,12 @@ type Storage interface {
 	ListForWeek(date string) ([]Event, error)
 	ListForMonth(date string) ([]Event, error)
 }
+
+type StorageConf struct {
+	Type string
+	User string
+	Pass string
+	Port string
+	Host string
+	Name string
+}

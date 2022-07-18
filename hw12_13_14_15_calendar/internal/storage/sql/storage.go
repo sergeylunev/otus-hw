@@ -2,12 +2,12 @@ package sqlstorage
 
 import (
 	"context"
+	"fmt"
 	"time"
-
-	"github.com/sergeylunev/otus-hw/hw12_13_14_15_calendar/internal/storage"
 
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"
+	"github.com/sergeylunev/otus-hw/hw12_13_14_15_calendar/internal/storage"
 	ltime "github.com/sergeylunev/otus-hw/hw12_13_14_15_calendar/internal/time"
 )
 
@@ -15,7 +15,8 @@ type Storage struct {
 	db *sqlx.DB
 }
 
-func New(dsn string) (*Storage, error) {
+func New(user, pass, dbname, port, host string) (*Storage, error) {
+	dsn := fmt.Sprintf("name=%s dbname=%s password=%s port=%s host=%s sslmode=disable", user, dbname, pass, port, host)
 	db, err := sqlx.Open("pgx", dsn)
 	if err != nil {
 		return nil, err
@@ -219,12 +220,17 @@ func getQueryResults(queryResult *sqlx.Rows) ([]storage.Event, error) {
 }
 
 func createEventFromRow(row map[string]interface{}) storage.Event {
+	description := ""
+	if _, ok := row["description"].(string); ok {
+		description = row["description"].(string)
+	}
+
 	return storage.Event{
 		ID:          row["id"].(int64),
 		Title:       row["title"].(string),
 		DateStart:   row["started_at"].(string),
 		DateEnd:     row["ended_at"].(string),
-		Description: row["description"].(string),
+		Description: description,
 		UserId:      row["user_id"].(int),
 	}
 }
