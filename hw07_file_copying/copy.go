@@ -15,8 +15,12 @@ var (
 )
 
 func Copy(fromPath, toPath string, offset, limit int64) error {
-	if exists, _ := fileExists(fromPath); !exists {
+	exists, err := fileExists(fromPath)
+	if !exists {
 		return ErrNoFileToCopy
+	}
+	if err != nil {
+		return err
 	}
 
 	size, err := fileSize(fromPath)
