@@ -15,6 +15,9 @@ type EnvValue struct {
 	NeedRemove bool
 }
 
+const newLine byte = 10
+const terminalByte byte = 0
+
 var (
 	ErrFileName = errors.New("wrong env file name")
 )
@@ -45,7 +48,7 @@ func ReadDir(dir string) (Environment, error) {
 			}
 			continue
 		}
-		bytes, err := os.ReadFile(path.Join(dir + "/" + f.Name()))
+		bytes, err := os.ReadFile(path.Join(dir, f.Name()))
 
 		if err != nil {
 			return nil, err
@@ -71,11 +74,11 @@ func ReadDir(dir string) (Environment, error) {
 func readEnvFromFile(b []byte) (string, error) {
 	result := make([]byte, 0, len(b))
 	for _, ch := range b {
-		if ch == 10 {
+		if ch == newLine {
 			break
 		}
-		if ch == 0 {
-			ch = 10
+		if ch == terminalByte {
+			ch = newLine
 		}
 		result = append(result, ch)
 	}
