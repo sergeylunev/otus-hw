@@ -13,7 +13,7 @@ var (
 
 type TelnetClient interface {
 	Connect() error
-	io.Closer
+	Close() error
 	Send() error
 	Receive() error
 }
