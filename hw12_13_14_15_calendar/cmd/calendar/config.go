@@ -10,7 +10,8 @@ import (
 type Config struct {
 	Logger  LoggerConf
 	Storage storage.StorageConf
-	Server  ServerConf
+	Server  HttpConf
+	Grpc    GrpcConf
 }
 
 type LoggerConf struct {
@@ -19,7 +20,12 @@ type LoggerConf struct {
 	Type      string
 }
 
-type ServerConf struct {
+type HttpConf struct {
+	Host string
+	Port string
+}
+
+type GrpcConf struct {
 	Host string
 	Port string
 }

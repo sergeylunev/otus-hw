@@ -11,6 +11,10 @@ port = 5431
 host = "127.0.0.1"
 name = "calendar"
 
-[server]
+[http]
 host = "127.0.0.1"
 port = "8081"
+
+[grpc]
+host = "127.0.0.1"
+port = "50051"

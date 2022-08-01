@@ -63,3 +63,6 @@ run-goose-migration-status:
 		goose postgres "user=calendar password=1231 dbname=calendar sslmode=disable port=5431" status	
 
 migrate: run-goose-migration-up
+
+generate:
+	go generate ./..
